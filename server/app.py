@@ -8,7 +8,6 @@ from config import app, db, api
 from models import User, Recipe
 
 class Signup(Resource):
-
     def post(self):
         json = request.get_json()
         if 'username' in json:
