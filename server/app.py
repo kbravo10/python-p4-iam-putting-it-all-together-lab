@@ -29,7 +29,7 @@ class Signup(Resource):
             session['user_id'] = new_user.id
             return new_user_dict,201
         else:
-            return ({"message": "Unprocessable Entity"}, 422)
+            return ({"error": "Unprocessable Entity"}, 422)
 
 class CheckSession(Resource):
     def get(self):
@@ -45,13 +45,13 @@ class CheckSession(Resource):
                 }
                 return user_info, 200
         else:
-            print('no luck')
-            return ({"message":"Unathorized"}, 401)
+            return ({"error":"Unathorized"}, 401)
 
 class Login(Resource):
     def post(self):
         user = request.get_json()           
         user_name = User.query.filter(User.username == user["username"]).first()
+        print(user_name)
         if user_name != None:
             if user_name.authenticate(user['password']) == True:
                 user_info = {
@@ -65,38 +65,47 @@ class Login(Resource):
             else:
                 return {"message":"Unathorized"}, 401
         else:
-            return {"message":"Unathorized"}, 401
+            q = {
+                'message': IntegrityError
+            }
+            return {'error': 'Unauthorized'}, 401
 
 class Logout(Resource):
     def delete(post):
         if session['user_id']:
             session['user_id'] = None
-            return {"message":"No Content"}, 204
-        return {"message":"Unathorized"}, 401
+            return {"error":"No Content"}, 204
+        return {"error":"Unathorized"}, 401
 
 class RecipeIndex(Resource):
     def get(self):
         if session['user_id']:
             recipes_user = Recipe.query.filter(Recipe.user_id == session['user_id']).all()
+            user = User.query.filter(User.id == session['user_id'])[0]
             recipes = []
+            user_dict = {
+                'username' : user.username,
+                'id': user.id,
+                'image_url' : user.image_url,
+                'bio' : user.bio
+            }
             for r in recipes_user:
                 recipe_dict = {
                     'title': r.title,
                     'instructions':r.instructions,
                     'minutes_to_complete':r.minutes_to_complete,
-                    'user_id':r.user_id
+                    'user': user_dict
                 }
                 recipes.append(recipe_dict)
-              
+                print(recipe_dict['title'])
             return recipes, 200
-        return {'message':'Unathorized'}, 401
+        return {'error':'Unathorized'}, 401
     
     def post(post):
 
         if session['user_id']:
             data = request.get_json()
             if len(data['instructions']) >= 50:
-       
                 new_recipe = Recipe(
                     instructions=data['instructions'],
                     minutes_to_complete=data['minutes_to_complete'],
@@ -105,12 +114,12 @@ class RecipeIndex(Resource):
                 new_recipe.user_id = session['user_id']
         
                 new_recipe_dict = new_recipe.to_dict()
+                print(new_recipe_dict)
                 db.session.add(new_recipe)
                 db.session.commit()
-              
                 return new_recipe_dict, 201
-            return {"message":"Unprocessable Entity"}, 422
-        return {'message':'Unathorized'}, 401
+            return {"error":"Unprocessable Entity"}, 422
+        return {'error':'Unathorized'}, 401
     
 
 api.add_resource(Signup, '/signup', endpoint='signup')
