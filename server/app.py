@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from flask import request, session
+from flask import request, session,jsonify
 from flask_restful import Resource
 from sqlalchemy.exc import IntegrityError
 
@@ -11,26 +11,28 @@ class Signup(Resource):
     def post(self):
         json = request.get_json()
         if 'username' in json and 'password' in json:
-            json_bio = None
-            json_image = None
-            if 'bio' in json:
-                json_bio = json['bio']
-            if 'image_url' in json:
-                json_image = json['image_url']
-            new_user = User(
-                username=json['username'],
-                bio =json_bio,
-                image_url = json_image
-            )
-            new_user.password_hash = json['password']
-            new_user_dict = new_user.to_dict()
-            db.session.add(new_user)
-            db.session.commit()
-            session['user_id'] = new_user.id
-            return new_user_dict,201
+            if len(json['username']) != 0: 
+                json_bio = None
+                json_image = None
+                if 'bio' in json:
+                    json_bio = json['bio']
+                if 'image_url' in json:
+                    json_image = json['image_url']
+                new_user = User(
+                    username=json['username'],
+                    bio =json_bio,
+                    image_url = json_image
+                )
+                new_user.password_hash = json['password']
+                new_user_dict = new_user.to_dict()
+                db.session.add(new_user)
+                db.session.commit()
+                session['user_id'] = new_user.id
+                return new_user_dict,201
+            else:
+                return ({"errors": "Unprocessable Entity"}, 422)
         else:
-            return ({"error": "Unprocessable Entity"}, 422)
-
+            return ({"errors": "Unprocessable Entity"}, 422)
 class CheckSession(Resource):
     def get(self):
         if session['user_id']:
@@ -45,8 +47,7 @@ class CheckSession(Resource):
                 }
                 return user_info, 200
         else:
-            return ({"error":"Unathorized"}, 401)
-
+            return ({"errors":"Unathorized"}, 401)
 class Login(Resource):
     def post(self):
         user = request.get_json()           
@@ -63,19 +64,19 @@ class Login(Resource):
                 session['user_id'] = user_name.id
                 return user_info, 200
             else:
-                return {"message":"Unathorized"}, 401
+                return {"errors":"Unathorized"}, 401
         else:
             q = {
-                'message': IntegrityError
+                "errors": "Unathorized"
             }
-            return {'error': 'Unauthorized'}, 401
-
+            print(q['errors'])
+            return q, 401
 class Logout(Resource):
     def delete(post):
         if session['user_id']:
             session['user_id'] = None
             return {"error":"No Content"}, 204
-        return {"error":"Unathorized"}, 401
+        return {"errors":"Unathorized"}, 401
 
 class RecipeIndex(Resource):
     def get(self):
@@ -99,10 +100,8 @@ class RecipeIndex(Resource):
                 recipes.append(recipe_dict)
                 print(recipe_dict['title'])
             return recipes, 200
-        return {'error':'Unathorized'}, 401
-    
+        return {'errors':'Unathorized'}, 401
     def post(post):
-
         if session['user_id']:
             data = request.get_json()
             if len(data['instructions']) >= 50:
@@ -118,8 +117,8 @@ class RecipeIndex(Resource):
                 db.session.add(new_recipe)
                 db.session.commit()
                 return new_recipe_dict, 201
-            return {"error":"Unprocessable Entity"}, 422
-        return {'error':'Unathorized'}, 401
+            return {"errors":"Unprocessable Entity"}, 422
+        return {'errors':'Unathorized'}, 401
     
 
 api.add_resource(Signup, '/signup', endpoint='signup')
