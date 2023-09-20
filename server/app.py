@@ -52,7 +52,6 @@ class Login(Resource):
     def post(self):
         user = request.get_json()           
         user_name = User.query.filter(User.username == user["username"]).first()
-        print(user_name)
         if user_name != None:
             if user_name.authenticate(user['password']) == True:
                 user_info = {
@@ -69,7 +68,6 @@ class Login(Resource):
             q = {
                 "errors": "Unathorized"
             }
-            print(q['errors'])
             return q, 401
 class Logout(Resource):
     def delete(post):
@@ -98,7 +96,6 @@ class RecipeIndex(Resource):
                     'user': user_dict
                 }
                 recipes.append(recipe_dict)
-                print(recipe_dict['title'])
             return recipes, 200
         return {'errors':'Unathorized'}, 401
     def post(post):
@@ -113,7 +110,6 @@ class RecipeIndex(Resource):
                 new_recipe.user_id = session['user_id']
         
                 new_recipe_dict = new_recipe.to_dict()
-                print(new_recipe_dict)
                 db.session.add(new_recipe)
                 db.session.commit()
                 return new_recipe_dict, 201
