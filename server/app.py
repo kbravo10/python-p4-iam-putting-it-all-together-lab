@@ -30,9 +30,9 @@ class Signup(Resource):
                 session['user_id'] = new_user.id
                 return new_user_dict,201
             else:
-                return ({"errors": "Unprocessable Entity"}, 422)
+                return {"errors": ["Unprocessable Entity"]}, 422
         else:
-            return ({"errors": "Unprocessable Entity"}, 422)
+            return {"errors": ["Unprocessable Entity"]}, 422
 class CheckSession(Resource):
     def get(self):
         if session['user_id']:
@@ -47,7 +47,7 @@ class CheckSession(Resource):
                 }
                 return user_info, 200
         else:
-            return ({"errors":"Unathorized"}, 401)
+            return {"errors":["Unathorized"]}, 401
 class Login(Resource):
     def post(self):
         user = request.get_json()           
@@ -63,18 +63,18 @@ class Login(Resource):
                 session['user_id'] = user_name.id
                 return user_info, 200
             else:
-                return {"errors":"Unathorized"}, 401
+                return {"errors":["Unathorized"]}, 401
         else:
             q = {
-                "errors": "Unathorized"
+                "errors": ["Unathorized"]
             }
             return q, 401
 class Logout(Resource):
     def delete(post):
         if session['user_id']:
             session['user_id'] = None
-            return {"error":"No Content"}, 204
-        return {"errors":"Unathorized"}, 401
+            return {"error":["No Content"]}, 204
+        return {"errors":["Unathorized"]}, 401
 
 class RecipeIndex(Resource):
     def get(self):
@@ -97,7 +97,7 @@ class RecipeIndex(Resource):
                 }
                 recipes.append(recipe_dict)
             return recipes, 200
-        return {'errors':'Unathorized'}, 401
+        return {'errors':['Unathorized']}, 401
     def post(post):
         if session['user_id']:
             data = request.get_json()
@@ -113,8 +113,8 @@ class RecipeIndex(Resource):
                 db.session.add(new_recipe)
                 db.session.commit()
                 return new_recipe_dict, 201
-            return {"errors":"Unprocessable Entity"}, 422
-        return {'errors':'Unathorized'}, 401
+            return {"errors":["Unprocessable Entity"]}, 422
+        return {'errors':['Unathorized']}, 401
     
 
 api.add_resource(Signup, '/signup', endpoint='signup')
