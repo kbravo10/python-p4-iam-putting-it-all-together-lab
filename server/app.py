@@ -65,10 +65,8 @@ class Login(Resource):
             else:
                 return {"errors":["Unathorized"]}, 401
         else:
-            q = {
-                "errors": ["Unathorized"]
-            }
-            return q, 401
+             
+            return {"errors": ["Unathorized"]}, 401
 class Logout(Resource):
     def delete(post):
         if session['user_id']:
