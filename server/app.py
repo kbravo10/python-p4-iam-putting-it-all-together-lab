@@ -31,35 +31,6 @@ class Signup(Resource):
         except Exception:
             return {"errors": ["Unprocessable Entity"]}, 422
 
-        # if 'username' in json and 'password' in json:
-        #     try:
-        #         if len(json['username']) != 0: 
-        #             json_bio = None
-        #             json_image = None
-        #             if 'bio' in json:
-        #                 json_bio = json['bio']
-        #             if 'image_url' in json:
-        #                 json_image = json['image_url']
-        #             new_user = User(
-        #                 username=json['username'],
-        #                 bio =json_bio,
-        #                 image_url = json_image
-        #             )
-        #             new_user.password_hash = json['password']
-        #             new_user_dict = new_user.to_dict()
-        #             db.session.add(new_user)
-        #             db.session.commit()
-        #             session['user_id'] = new_user.id
-        #             return new_user_dict,201
-        #     except Exception:
-        #         return {"errors": ["Unprocessable Entity"]}, 422
-        #     else:
-        #         return {"errors": ["Unprocessable Entity"]}, 422
-        # else:
-        #     return {"errors": ["Unprocessable Entity"]}, 422
-        
-
-
 class CheckSession(Resource):
     def get(self):
         if session['user_id']:
@@ -141,20 +112,6 @@ class RecipeIndex(Resource):
                 return new_recipe_dict, 201
             except Exception:
                 return {"errors":["Unprocessable Entity"]}, 422
-
-            # if len(data['instructions']) >= 50:
-            #     new_recipe = Recipe(
-            #         instructions=data['instructions'],
-            #         minutes_to_complete=data['minutes_to_complete'],
-            #         title=data['title']
-            #     )
-            #     new_recipe.user_id = session['user_id']
-        
-            #     new_recipe_dict = new_recipe.to_dict()
-            #     db.session.add(new_recipe)
-            #     db.session.commit()
-            #     return new_recipe_dict, 201
-            # return {"errors":["Unprocessable Entity"]}, 422
         return {'errors':['Unathorized']}, 401
     
 

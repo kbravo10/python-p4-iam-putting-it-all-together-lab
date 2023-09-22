@@ -15,6 +15,11 @@ class User(db.Model, SerializerMixin):
 
     recipes = db.relationship('Recipe', backref = 'user')
 
+    @validates('username')
+    def validates_username(self,key,users):
+        if len(users) != 0:
+            return users
+
     @hybrid_property
     def password_hash(self):
         raise AttributeError()
@@ -50,6 +55,12 @@ class Recipe(db.Model, SerializerMixin):
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
+
+    @validates('title')
+    def validates_title(self, key, recipes):
+        if len(recipes) != 0:
+            return recipes
+        
     @validates('instructions')
     def validates_instructions(self, key, recipes):
         if len(recipes) >= 50:
