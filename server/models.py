@@ -1,5 +1,6 @@
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_serializer import SerializerMixin
+from sqlalchemy.orm import validates
 
 from config import db, bcrypt
 
@@ -42,7 +43,14 @@ class Recipe(db.Model, SerializerMixin):
     
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
-    instructions = db.Column(db.String, nullable=False)
+    instructions = db.Column(db.String, 
+                             db.CheckConstraint('len(instructions) >= 50'),
+                             nullable=False)
     minutes_to_complete = db.Column(db.Integer,nullable=False)
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    @validates('instructions')
+    def validates_instructions(self, key, recipes):
+        if len(recipes) >= 50:
+            return recipes
